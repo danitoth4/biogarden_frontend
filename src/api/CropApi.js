@@ -6,7 +6,7 @@ const SERVER_URL = `${SERVER}/crop`;
 class CropApi
 {
 
-    static async GetAllCrops()
+    static async getAllCrops()
     {
         const options = 
         {
@@ -26,6 +26,8 @@ class CropApi
         return fetch(`${SERVER_URL}/${cropId}`, options);
     }
 }
+
+export default CropApi;
 
 
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import Popup from './components/Popup'
+import Popup from './components/Popup';
+import CropApi from './api/CropApi';
 
 class Canvas extends React.Component
 {
@@ -140,7 +141,7 @@ class Canvas extends React.Component
             <button onClick={this.togglePopup.bind(this)}>show popup</button>
             <canvas ref="canvas" width={this.state.width} height={this.state.height} style={styles} onClick = {e => this.handleClick(e)}/>
             {this.state.showPopup ? 
-                <Popup text='Close Me' closePopup={this.togglePopup.bind(this)}/>
+                <Popup text='Close Me' closePopup={this.togglePopup.bind(this)} cropData ={CropApi.getAllCrops()}/>
                 : null 
                 }     
           </div>
