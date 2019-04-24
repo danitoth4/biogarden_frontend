@@ -16,7 +16,7 @@ class CropApi
         return fetch(SERVER_URL, options).then(response => response.json());
     }
 
-    static async deleteEvent(cropId)
+    static async deleteCrop(cropId)
     {
         const options =
         {
