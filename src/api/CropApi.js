@@ -8,11 +8,22 @@ class CropApi
 
     static async GetAllCrops()
     {
-        const options = {
+        const options = 
+        {
             method: "get"
         }
 
         return fetch(SERVER_URL, options).then(response => response.json());
+    }
+
+    static async deleteEvent(cropId)
+    {
+        const options =
+        {
+            method: "delete"
+        }
+
+        return fetch(`${SERVER_URL}/${cropId}`, options);
     }
 }
 

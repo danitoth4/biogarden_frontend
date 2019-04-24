@@ -1,4 +1,5 @@
 import React from 'react';
+import Popup from './components/Popup'
 
 class Canvas extends React.Component
 {
@@ -25,10 +26,21 @@ class Canvas extends React.Component
             height: h,
             cellSize: cS,
             grid: x,
-            images: {}
+            images: {},
+            showPopup: false
         };
 
         this.handleClick = this.handleClick.bind(this);
+    }
+
+    togglePopup()
+    {
+        this.setState(prevState => 
+            {
+                return{
+                    showPopup: !prevState.showPopup
+                }
+            });
     }
 
     componentDidMount() 
@@ -125,7 +137,12 @@ class Canvas extends React.Component
         }
         return(
           <div>
-            <canvas ref="canvas" width={this.state.width} height={this.state.height} style={styles} onClick = {e => this.handleClick(e)}/>           
+            <button onClick={this.togglePopup.bind(this)}>show popup</button>
+            <canvas ref="canvas" width={this.state.width} height={this.state.height} style={styles} onClick = {e => this.handleClick(e)}/>
+            {this.state.showPopup ? 
+                <Popup text='Close Me' closePopup={this.togglePopup.bind(this)}/>
+                : null 
+                }     
           </div>
         )
     }
