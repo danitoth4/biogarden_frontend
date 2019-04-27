@@ -1,6 +1,7 @@
 import React from 'react';
 import Popup from './components/Popup';
 import CropApi from './api/CropApi';
+import GardenApi from './api/GardenApi';
 
 class Canvas extends React.Component
 {
@@ -16,9 +17,11 @@ class Canvas extends React.Component
         {
             x[i] = new Array(w / cS);
         }
+        console.log(w / cS);
+        console.log(h / cS);
 
-        x[2][5] = "http://designingflicks.com/images/strawberry-svg-4.png";
-        x[3][10] = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Bananas.svg/1280px-Bananas.svg.png";
+        //x[2][5] = "http://designingflicks.com/images/strawberry-svg-4.png";
+        //x[3][10] = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Bananas.svg/1280px-Bananas.svg.png";
 
         this.state = 
         {
@@ -94,7 +97,7 @@ class Canvas extends React.Component
             ctx.lineTo(i, this.state.height);
             ctx.stroke();           
         }
-
+/*
         for(let i = 0; i < this.state.grid.length; ++i)
         {
             for(let j = 0; j < this.state.grid[i].length; ++j)
@@ -102,9 +105,9 @@ class Canvas extends React.Component
                 if(this.state.grid[i][j] != null )
                 {                   
                     let imageObj = new Image();
-                    let size = this.state.cellSize * 0.7;
-                    imageObj.i = i * this.state.cellSize + this.state.cellSize * 0.15;
-                    imageObj.j = j * this.state.cellSize + this.state.cellSize * 0.15;
+                    let size = this.state.cellSize * 0.8 * 1;
+                    imageObj.i = i * this.state.cellSize + this.state.cellSize * 0.1 * 1;
+                    imageObj.j = j * this.state.cellSize + this.state.cellSize * 0.1 * 1;
                     imageObj.onload = function()
                     {
                         ctx.drawImage(this, this.j, this.i, size, size);
@@ -113,7 +116,31 @@ class Canvas extends React.Component
                 
                 }
             }
-        }
+        }*/
+
+        GardenApi.getPlantedCrops().then(data => 
+            {
+                for(let i = 0; i < data.length; ++i)
+                {
+                    if(data[i])
+                    {
+                        let xsize = data[i].endPoint.x - data[i].startPoint.x;
+                        let ysize = data[i].endPoint.y - data[i].startPoint.y;
+                        let imageObj = new Image();
+                        imageObj.i = data[i].startPoint.x * this.state.cellSize + this.state.cellSize * 0.1 * xsize;
+                        imageObj.j = data[i].startPoint.y * this.state.cellSize + this.state.cellSize * 0.1 * ysize;
+                        let cS = this.state.cellSize;
+                        imageObj.onload = function()
+                        {
+                            ctx.drawImage(this, this.i, this.j, xsize * cS * 0.8, ysize * cS * 0.8);
+                        }
+                        imageObj.src = data[i].cropType.imageUrl;
+                        //console.log(`${data[i].startPoint.y} img: ${data[i].cropType.imageUrl} cell: ${cS}`);
+                    }
+                }
+            }
+        );
+
         this.setState(
             {
                 drawn: true
@@ -123,9 +150,7 @@ class Canvas extends React.Component
 
     handleClick(e)
     {
-        
-        const canvas = this.refs.canvas;
-        const ctx = canvas.getContext("2d");
+        //we do something here
     }
 
     render() 
