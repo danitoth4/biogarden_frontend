@@ -21,8 +21,9 @@ export default class Crop extends React.Component
         }
         return(
             <div>
-                {this.props.name}
-                <img src = {deleteicon} alt = "meaningfull text" style = {style} onClick = {this.handleDelete}/>
+                {this.props.crop.name}
+                <img src = {deleteicon} alt = "" style = {style} onClick = {this.handleDelete}/>
+                <button  onClick = {() =>this.props.cropSelected(this.props.crop)}>select</button>
             </div>
         );
     }
@@ -32,7 +33,6 @@ export default class Crop extends React.Component
 
         if(this.props.id)
         {
-            console.log('fccfd');
             CropApi.deleteCrop(this.props.id)
         }
     }

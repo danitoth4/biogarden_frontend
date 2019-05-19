@@ -1,5 +1,6 @@
 import {SERVER} from "./ServerUrl";
 
+const  SERVER_URL = `${SERVER}/planting`;
 
 export default class GardenApi
 {
@@ -12,9 +13,42 @@ export default class GardenApi
         {
             method: "get"
         };
-        const  SERVER_URL = `${SERVER}/planting`;
 
         return fetch(SERVER_URL, options).then(response => response.json());
 
+    }
+
+    static async modifyCrops(plantingOperation)
+    {
+        if(plantingOperation.method === "ADDED")
+            return this.plantCrops(plantingOperation);
+        else
+            return this.deleteCrops(plantingOperation);
+    }
+
+    static async plantCrops(plantingOperation)
+    {
+        let headers = new Headers();
+        headers.append('Content-Type','application/json');
+        const options =
+        {
+            method: "post",
+            headers: headers,
+            body: JSON.stringify(plantingOperation)
+        };
+        return fetch(SERVER_URL, options).then(response => response.json());
+    }
+ 
+    static async deleteCrops(plantingOperation)
+    {
+        let headers = new Headers();
+        headers.append('Content-Type','application/json');
+        const options =
+        {
+            method: "delete",
+            headers: headers,
+            body: JSON.stringify(plantingOperation)
+        };
+        return fetch(SERVER_URL, options).then(response => response.json());
     }
 }

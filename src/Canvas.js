@@ -20,9 +20,6 @@ class Canvas extends React.Component
         console.log(w / cS);
         console.log(h / cS);
 
-        //x[2][5] = "http://designingflicks.com/images/strawberry-svg-4.png";
-        //x[3][10] = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Bananas.svg/1280px-Bananas.svg.png";
-
         this.state = 
         {
             drawn: false,
@@ -33,8 +30,9 @@ class Canvas extends React.Component
             images: {},
             showPopup: false
         };
-
-        this.handleClick = this.handleClick.bind(this);
+        this.planting = {};
+        this.handleMouseDown = this.handleMouseDown.bind(this);
+        this.handleMouseUp = this.handleMouseUp.bind(this);
     }
 
     togglePopup()
@@ -48,8 +46,12 @@ class Canvas extends React.Component
     }
 
     componentDidMount() 
-    {
-        this.drawGrid();
+    {  
+        GardenApi.getPlantedCrops().then(data => 
+            {
+                this.drawGarden(data);
+            }
+        );
         fetch("http://localhost:8080/crop")
             .then(response => response.json())
             .then(data => 
@@ -77,10 +79,9 @@ class Canvas extends React.Component
 
     drawGrid()
     {
-        if(this.state.drawn)
-            return;
         const canvas = this.refs.canvas;
         const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.setLineDash([2, 5,]);
 
@@ -97,76 +98,85 @@ class Canvas extends React.Component
             ctx.lineTo(i, this.state.height);
             ctx.stroke();           
         }
-/*
-        for(let i = 0; i < this.state.grid.length; ++i)
+
+    }
+
+    drawGarden(data)
+    {
+        this.drawGrid();
+        const canvas = this.refs.canvas;
+        const ctx = canvas.getContext("2d");
+        for(let i = 0; i < data.length; ++i)
         {
-            for(let j = 0; j < this.state.grid[i].length; ++j)
+            if(data[i])
             {
-                if(this.state.grid[i][j] != null )
-                {                   
-                    let imageObj = new Image();
-                    let size = this.state.cellSize * 0.8 * 1;
-                    imageObj.i = i * this.state.cellSize + this.state.cellSize * 0.1 * 1;
-                    imageObj.j = j * this.state.cellSize + this.state.cellSize * 0.1 * 1;
-                    imageObj.onload = function()
-                    {
-                        ctx.drawImage(this, this.j, this.i, size, size);
-                    }
-                    imageObj.src = this.state.grid[i][j];
-                
-                }
-            }
-        }*/
-
-        GardenApi.getPlantedCrops().then(data => 
-            {
-                for(let i = 0; i < data.length; ++i)
+                let xsize = data[i].endPoint.x - data[i].startPoint.x;
+                let ysize = data[i].endPoint.y - data[i].startPoint.y;
+                let imageObj = new Image();
+                imageObj.i = data[i].startPoint.x * this.state.cellSize + this.state.cellSize * 0.05 * xsize;
+                imageObj.j = data[i].startPoint.y * this.state.cellSize + this.state.cellSize * 0.05 * ysize;
+                let cS = this.state.cellSize;
+                imageObj.onload = function()
                 {
-                    if(data[i])
-                    {
-                        let xsize = data[i].endPoint.x - data[i].startPoint.x;
-                        let ysize = data[i].endPoint.y - data[i].startPoint.y;
-                        let imageObj = new Image();
-                        imageObj.i = data[i].startPoint.x * this.state.cellSize + this.state.cellSize * 0.1 * xsize;
-                        imageObj.j = data[i].startPoint.y * this.state.cellSize + this.state.cellSize * 0.1 * ysize;
-                        let cS = this.state.cellSize;
-                        imageObj.onload = function()
-                        {
-                            ctx.drawImage(this, this.i, this.j, xsize * cS * 0.8, ysize * cS * 0.8);
-                        }
-                        imageObj.src = data[i].cropType.imageUrl;
-                        //console.log(`${data[i].startPoint.y} img: ${data[i].cropType.imageUrl} cell: ${cS}`);
-                    }
+                    ctx.drawImage(this, this.i, this.j, xsize * cS * 0.9, ysize * cS * 0.9);
                 }
+                imageObj.src = data[i].cropType.imageUrl;
             }
-        );
-
+        }
         this.setState(
             {
                 drawn: true
             }
         );
-    } 
+    }
 
-    handleClick(e)
+    //event handlers
+
+    handleMouseDown(e)
     {
-        //we do something here
+        this.planting.x1 = this.convertToGardenCoordinate(e.clientX);
+        this.planting.y1 = this.convertToGardenCoordinate(e.clientY);
+    }
+
+    handleMouseUp(e)
+    {
+        this.planting.x2 = this.convertToGardenCoordinate(e.clientX) + 1;
+        this.planting.y2 = this.convertToGardenCoordinate(e.clientY) + 1;
+        this.togglePopup();
+    }
+
+    convertToGardenCoordinate(value)
+    {
+        return Math.floor(value / this.state.cellSize);
+    }
+
+    cropSelected(crop)
+    {
+        this.togglePopup();
+        this.planting.crop = crop;
+        this.planting.method = "ADDED";
+        GardenApi.modifyCrops(this.planting).then(data => {this.drawGarden(data)});
+    }
+
+    deleteSelected()
+    {
+        this.togglePopup();
+        this.planting.method = "DELETED";
+        GardenApi.modifyCrops(this.planting).then(data => {this.drawGarden(data)});
     }
 
     render() 
     {
         const styles = 
         {
-            margin: "10px",
             border: "2px solid", 
             backgroundColor: "#70e335" //light green
         }
         return(
           <div>
-            <button onClick={this.togglePopup.bind(this)}>show popup</button>
-            <canvas ref="canvas" width={this.state.width} height={this.state.height} style={styles} onClick = {e => this.handleClick(e)}/>
+            <canvas ref="canvas" width={this.state.width} height={this.state.height} style={styles} onMouseDown = {e => this.handleMouseDown(e)} onMouseUp = {e => this.handleMouseUp(e)}/>
             {this.state.showPopup ? 
-                <Popup text='Close Me' closePopup={this.togglePopup.bind(this)} cropData ={CropApi.getAllCrops()}/>
+                <Popup text='Close Me' closePopup={this.togglePopup.bind(this)} cropSelected = {this.cropSelected.bind(this)} deleteSelected = {this.deleteSelected.bind(this)} cropData ={CropApi.getAllCrops()}/>
                 : null 
                 }     
           </div>

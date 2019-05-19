@@ -11,7 +11,7 @@ class CropApi
         const options = 
         {
             method: "get"
-        }
+        };
 
         return fetch(SERVER_URL, options).then(response => response.json());
     }

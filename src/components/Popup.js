@@ -33,14 +33,16 @@ class Popup extends React.Component
         let cropComponents;
         if(this.state.crops)
         {
+            console.log(this.state.crops);
             cropComponents = this.state.crops.map( (crop) =>
-                <Crop key = {crop.id} name = {crop.name} id = {crop.id}></Crop>
+                <Crop key = {crop.id} crop={crop} cropSelected = {this.props.cropSelected}></Crop>
             );
         }
 
         return(
             <div className = "popup">
                 <div className = "popup_inner">
+                    <button onClick={this.props.deleteSelected}>Clear</button>
                     <h1>{this.props.text}</h1>
                     {cropComponents ? cropComponents : <h4>Loading..</h4>}
                     <button onClick={this.props.closePopup}>Close</button>
