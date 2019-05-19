@@ -170,16 +170,17 @@ class Canvas extends React.Component
         const styles = 
         {
             border: "2px solid", 
-            backgroundColor: "#70e335" //light green
+            backgroundColor: "#70e335", //light green
+             
         }
         return(
-          <div>
-            <canvas ref="canvas" width={this.state.width} height={this.state.height} style={styles} onMouseDown = {e => this.handleMouseDown(e)} onMouseUp = {e => this.handleMouseUp(e)}/>
-            {this.state.showPopup ? 
-                <Popup text='Close Me' closePopup={this.togglePopup.bind(this)} cropSelected = {this.cropSelected.bind(this)} deleteSelected = {this.deleteSelected.bind(this)} cropData ={CropApi.getAllCrops()}/>
-                : null 
-                }     
-          </div>
+            <div>
+                <canvas ref="canvas" width={this.state.width} height={this.state.height} style={styles} onMouseDown = {e => this.handleMouseDown(e)} onMouseUp = {e => this.handleMouseUp(e)}/>
+                {this.state.showPopup ? 
+                    <Popup text='Close Me' closePopup={this.togglePopup.bind(this)} cropSelected = {this.cropSelected.bind(this)} deleteSelected = {this.deleteSelected.bind(this)} cropData ={CropApi.getAllCrops()}/>
+                    : null 
+                    }     
+            </div>
         )
     }
 }

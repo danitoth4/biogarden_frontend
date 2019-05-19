@@ -16,6 +16,15 @@ class CropApi
         return fetch(SERVER_URL, options).then(response => response.json());
     }
 
+    static async getCrop(id)
+    {
+        const options =
+        {
+            method: "get"
+        };
+        return fetch(`${SERVER_URL}/${id}`, options).then(response =>response.json())
+    }
+
     static async deleteCrop(cropId)
     {
         const options =

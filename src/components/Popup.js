@@ -44,6 +44,7 @@ class Popup extends React.Component
                 <div className = "popup_inner">
                     <button onClick={this.props.deleteSelected}>Clear</button>
                     <h1>{this.props.text}</h1>
+                    <hr />
                     {cropComponents ? cropComponents : <h4>Loading..</h4>}
                     <button onClick={this.props.closePopup}>Close</button>
                 </div>
