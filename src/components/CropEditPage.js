@@ -1,8 +1,8 @@
 import React from 'react';
 import CropApi from '../api/CropApi';
 import CompanionApi from '../api/CompanionApi';
-import { Tab, Tabs, Select} from 'grommet';
-import Crop from './Crop';
+import { Tab, Tabs, Select, Button, Text} from 'grommet';
+import { Link } from 'react-router-dom';
 import CompanionItem from './CompanionItem';
 
 class CropEditPage extends React.Component
@@ -63,11 +63,6 @@ class CropEditPage extends React.Component
 
     }
 
-    backToGarden()
-    {
-
-    }
-
     onCompanionRemove(id, isPositive)
     {
         this.setState(prevState => { return({
@@ -93,10 +88,14 @@ class CropEditPage extends React.Component
             const options = this.state.otherCrops.filter(crop => crop.id != this.props.match.params.cropId && !this.state.companions.some(e => e.cropId2 === crop.id)).map(c => c.name);
             console.log(comps);
             return( 
-                    <div>
-                        <h1>{this.state.cropData.name}</h1>
+                    <div style ={{margin: "5%"}}>
+                        <h1 style = {{display: "inline-block"}}>{this.state.cropData.name}</h1>
+                        <h3 style ={{fontStyle: "italic"}}>{this.state.cropData.binomialName}</h3>
+                        <img src = {this.state.cropData.imageUrl} alt = "" style = {{width: "15%"}}/>
+                        <p>Diameter: {this.state.cropData.diameter} cm </p>
+                        <p> Description: {this.state.cropData.description ||  "n/a"}</p>
                         <h2>Companions</h2>
-                        <Tabs >
+                        <Tabs>
                             <Tab title = "Preferable">
                                 <Select 
                                     options={options}
@@ -114,6 +113,9 @@ class CropEditPage extends React.Component
                                 {comps.filter(cmp => !cmp.props.positive)}
                             </Tab>
                         </Tabs>
+                        <Link to = {{pathname: '/'}}>
+                            <Button primary = {true} alignSelf = "center" color = "neutral-1" label = "Back to Garden"/>
+                        </Link>
                     </div> 
                 
             );

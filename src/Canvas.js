@@ -8,8 +8,8 @@ class Canvas extends React.Component
     constructor(props)
     {
         super(props);
-        let w = this.props.width - this.props.width % 35;
-        let cS = w / 35;
+        let w = this.props.width - this.props.width % 60;
+        let cS = w / 60;
         let h = this.props.height - this.props.height % cS;
 
         let x = new Array(h / cS);
