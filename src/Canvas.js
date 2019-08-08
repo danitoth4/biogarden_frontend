@@ -1,15 +1,15 @@
 import React from 'react';
 import Popup from './components/Popup';
 import CropApi from './api/CropApi';
-import GardenApi from './api/GardenApi';
+import PlantingApi from './api/PlantingApi';
 
 class Canvas extends React.Component
 {
     constructor(props)
     {
         super(props);
-        let w = this.props.width - this.props.width % 60;
-        let cS = w / 60;
+        let w = this.props.width - this.props.width % 70;
+        let cS = w / 70;
         let h = this.props.height - this.props.height % cS;
 
         let x = new Array(h / cS);
@@ -47,7 +47,7 @@ class Canvas extends React.Component
 
     componentDidMount() 
     {  
-        GardenApi.getPlantedCrops().then(data => 
+        PlantingApi.getPlantedCrops().then(data => 
             {
                 this.drawGarden(data);
             }
@@ -155,14 +155,14 @@ class Canvas extends React.Component
         this.togglePopup();
         this.planting.crop = crop;
         this.planting.method = "ADDED";
-        GardenApi.modifyCrops(this.planting).then(data => {this.drawGarden(data)});
+        PlantingApi.modifyCrops(this.planting).then(data => {this.drawGarden(data)});
     }
 
     deleteSelected()
     {
         this.togglePopup();
         this.planting.method = "DELETED";
-        GardenApi.modifyCrops(this.planting).then(data => {this.drawGarden(data)});
+        PlantingApi.modifyCrops(this.planting).then(data => {this.drawGarden(data)});
     }
 
     render() 

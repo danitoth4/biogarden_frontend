@@ -1,13 +1,10 @@
 import {SERVER} from "./ServerUrl";
 
-const  SERVER_URL = `${SERVER}/planting`;
+const SERVER_URL = `${SERVER}/garden`
 
 export default class GardenApi
 {
-    static async getGardenInfo()
-    {}
-
-    static async getPlantedCrops()
+    static async getGardens()
     {
         const options = 
         {
@@ -15,40 +12,48 @@ export default class GardenApi
         };
 
         return fetch(SERVER_URL, options).then(response => response.json());
-
     }
 
-    static async modifyCrops(plantingOperation)
+    static async getGarden(id)
     {
-        if(plantingOperation.method === "ADDED")
-            return this.plantCrops(plantingOperation);
-        else
-            return this.deleteCrops(plantingOperation);
+        const options = 
+        {
+            method: "get"
+        };
+
+        return fetch(`${SERVER_URL}/${id}`, options).then(response => response.json());
     }
 
-    static async plantCrops(plantingOperation)
+    static async createGarden(garden)
     {
-        let headers = new Headers();
-        headers.append('Content-Type','application/json');
         const options =
         {
-            method: "post",
-            headers: headers,
-            body: JSON.stringify(plantingOperation)
+            method = "post",
+            body = JSON.stringify(garden)
         };
+
         return fetch(SERVER_URL, options).then(response => response.json());
     }
- 
-    static async deleteCrops(plantingOperation)
+
+    static async updateGarden(id, garden)
     {
-        let headers = new Headers();
-        headers.append('Content-Type','application/json');
         const options =
         {
-            method: "delete",
-            headers: headers,
-            body: JSON.stringify(plantingOperation)
+            method = "put",
+            body = JSON.stringify(garden)
         };
-        return fetch(SERVER_URL, options).then(response => response.json());
+
+        return fetch(`${SERVER_URL}/${id}`, options).then(response => response.json());
     }
+
+    static async deleteGarden(id)
+    {
+        const options = 
+        {
+            method: "delete"
+        };
+
+        return fetch(`${SERVER_URL}/${id}`, options).then(response => response.json());
+    }
+
 }
