@@ -23,7 +23,7 @@ class GardenList extends React.Component
         if(this.state.gardens)
         {
             console.log(this.state.gardens)
-            var gardenComponents = this.state.gardens.map(g => <GardenListItem id={g.id} name={g.name} />)
+            var gardenComponents = this.state.gardens.map(g => <GardenListItem id={g.id} name={g.name} length={g.length} width={g.width} />)
             return(<div> {gardenComponents} </div>)
         }
         else

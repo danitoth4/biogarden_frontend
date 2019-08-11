@@ -10,7 +10,7 @@ class App extends Component {
     return (
       <Router>
         <Route exact={true} path="/" render = {(props) =>  <GardenList />}/>
-        <Route path="/garden/:gardenId" render={props => <Canvas width = {window.innerWidth} height = {window.innerHeight} {...props}/>}/>
+        <Route path="/garden/:gardenId" render={props => <Canvas {...props} />}/>
         <Route path = "/crop/:cropId" render = {(props) => <CropEditPage {...props} />}/>
       </Router>
     );

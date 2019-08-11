@@ -2,33 +2,25 @@ import React from 'react';
 import Popup from './components/Popup';
 import CropApi from './api/CropApi';
 import PlantingApi from './api/PlantingApi';
+import GardenApi from './api/GardenApi';
 
 class Canvas extends React.Component
 {
     constructor(props)
     {
         super(props);
-        let w = this.props.width - this.props.width % 70;
-        let cS = w / 70;
-        let h = this.props.height - this.props.height % cS;
-
-        let x = new Array(h / cS);
-        for(let i = 0; i < x.length; ++i)
-        {
-            x[i] = new Array(w / cS);
-        }
-        console.log(w / cS);
-        console.log(h / cS);
-
+        
         this.state = 
         {
+            id: this.props.match.params.gardenId,
             drawn: false,
-            width: w,
-            height: h,
-            cellSize: cS,
-            grid: x,
+            width: null,
+            height: null,
+            cellSize: null,
+            grid: null,
             images: {},
-            showPopup: false
+            showPopup: false,
+            zoom: null
         };
         this.planting = {};
         this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -45,15 +37,68 @@ class Canvas extends React.Component
             });
     }
 
-    componentDidMount() 
+    async componentDidMount() 
     {  
-        PlantingApi.getPlantedCrops().then(data => 
+        let cS = 40;
+        let gardenX, gardenY;
+        console.log(this.props.location.state);
+        if(this.props.location.state && this.props.location.state.width && this.props.location.state.length)
+        {
+            gardenX = this.props.location.state.width;
+            gardenY = this.props.location.state.length;
+        }
+        else
+        {
+            let garden = await GardenApi.getGarden(this.state.id);
+            gardenX = garden.width;
+            gardenY = garden.length;
+        }
+        console.log(window.innerWidth);
+        let w = window.innerWidth - window.innerWidth % cS;
+        let h = window.innerHeight - window.innerHeight % cS;
+        
+        // set default zoom 
+        let zoom = 1.0;
+
+        // if the window size divided by the cell size is bigger than the number of gardens cells then we are fine otherwise we have to set the zoom to the fraction
+        if(w / cS > gardenX)
+            w = gardenX * cS;
+        else
+        {
+            zoom = gardenX / (w / cS);
+        }
+        
+        if(h / cS > gardenY)
+            h = gardenY * cS;
+        else
+        {
+            //bigger zoom wins so that everything  fits on the screen
+            zoom = zoom <= ( gardenY / (h / cS) ) ? gardenY / (h / cS) : zoom; 
+        }
+
+        let x = new Array(gardenY);
+        for(let i = 0; i < x.length; ++i)
+        {
+            x[i] = new Array(gardenX);
+        }
+        
+        await this.setState(
+            {
+                width: w,
+                height: h,
+                cellSize: cS,
+                grid: x,
+                zoom: zoom
+            }
+        );
+
+
+        PlantingApi.getPlantedCrops(this.state.id, this.state.zoom).then(data => 
             {
                 this.drawGarden(data);
             }
         );
-        fetch("http://localhost:8080/crop")
-            .then(response => response.json())
+        CropApi.getAllCrops()
             .then(data => 
                     {
                         for(let i = 0; i < data.length; ++i)
@@ -73,6 +118,7 @@ class Canvas extends React.Component
                                 }
                             );
                         }
+                        console.log(this.state.images);
                     }
                 );
     }
@@ -155,14 +201,14 @@ class Canvas extends React.Component
         this.togglePopup();
         this.planting.crop = crop;
         this.planting.method = "ADDED";
-        PlantingApi.modifyCrops(this.planting).then(data => {this.drawGarden(data)});
+        PlantingApi.modifyCrops(this.planting, this.state.id).then(data => {this.drawGarden(data)});
     }
 
     deleteSelected()
     {
         this.togglePopup();
         this.planting.method = "DELETED";
-        PlantingApi.modifyCrops(this.planting).then(data => {this.drawGarden(data)});
+        PlantingApi.modifyCrops(this.planting, this.state.id).then(data => {this.drawGarden(data)});
     }
 
     render() 
