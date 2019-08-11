@@ -1,6 +1,6 @@
 import {SERVER} from "./ServerUrl";
 
-const  SERVER_URL = `${SERVER}/planting/78`;
+const  SERVER_URL = `${SERVER}/planting/3`;
 
 export default class PlantingAPi
 {

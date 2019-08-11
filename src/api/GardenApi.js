@@ -28,8 +28,8 @@ export default class GardenApi
     {
         const options =
         {
-            method = "post",
-            body = JSON.stringify(garden)
+            method: "post",
+            body: JSON.stringify(garden)
         };
 
         return fetch(SERVER_URL, options).then(response => response.json());
@@ -39,8 +39,8 @@ export default class GardenApi
     {
         const options =
         {
-            method = "put",
-            body = JSON.stringify(garden)
+            method: "put",
+            body: JSON.stringify(garden)
         };
 
         return fetch(`${SERVER_URL}/${id}`, options).then(response => response.json());
