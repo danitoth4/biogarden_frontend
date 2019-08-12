@@ -11,7 +11,7 @@ export default class PlantingAPi
             method: "get"
         };
 
-        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}?zoomS=${zoom}`, options).then(response => response.json());
 
     }
 
@@ -33,7 +33,7 @@ export default class PlantingAPi
             headers: headers,
             body: JSON.stringify(plantingOperation)
         };
-        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}?zoomS=${zoom}`, options).then(response => response.json());
     }
  
     static async deleteCrops(plantingOperation, id, zoom)
@@ -46,6 +46,6 @@ export default class PlantingAPi
             headers: headers,
             body: JSON.stringify(plantingOperation)
         };
-        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}?zoomS=${zoom}`, options).then(response => response.json());
     }
 }

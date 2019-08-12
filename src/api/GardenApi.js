@@ -26,9 +26,12 @@ export default class GardenApi
 
     static async createGarden(garden)
     {
+        let headers = new Headers();
+        headers.append("Content-Type", "application/json");
         const options =
         {
             method: "post",
+            headers: headers,
             body: JSON.stringify(garden)
         };
 
@@ -37,9 +40,12 @@ export default class GardenApi
 
     static async updateGarden(id, garden)
     {
+        let headers = new Headers();
+        headers.append("Content-Type", "application/json");
         const options =
         {
             method: "put",
+            headers: headers,
             body: JSON.stringify(garden)
         };
 

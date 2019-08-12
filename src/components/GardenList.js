@@ -1,6 +1,8 @@
 import React from 'react';
 import GardenApi from '../api/GardenApi';
 import GardenListItem from './GardenListitem';
+import { Button } from 'grommet';
+import { Link } from 'react-router-dom';
 
 class GardenList extends React.Component
 {
@@ -24,7 +26,17 @@ class GardenList extends React.Component
         {
             console.log(this.state.gardens)
             var gardenComponents = this.state.gardens.map(g => <GardenListItem id={g.id} name={g.name} length={g.length} width={g.width} />)
-            return(<div> {gardenComponents} </div>)
+            return(
+                <div>
+                    <Link to = '/creategarden'>
+                        <Button primary = {true} alignSelf = "center" color = "neutral-1" label = "New Garden"/>
+                    </Link>
+                    <hr />
+                    <div> 
+                        {gardenComponents}
+                    </div>
+                </div>
+            );
         }
         else
         {

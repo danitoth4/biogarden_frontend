@@ -25,6 +25,7 @@ class Canvas extends React.Component
         this.planting = {};
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
+        this.calculateGridSize = this.calculateGridSize.bind(this);
     }
 
     togglePopup()
@@ -37,11 +38,10 @@ class Canvas extends React.Component
             });
     }
 
-    async componentDidMount() 
-    {  
+    async calculateGridSize()
+    {
         let cS = 40;
         let gardenX, gardenY;
-        console.log(this.props.location.state);
         if(this.props.location.state && this.props.location.state.width && this.props.location.state.length)
         {
             gardenX = this.props.location.state.width;
@@ -53,7 +53,7 @@ class Canvas extends React.Component
             gardenX = garden.width;
             gardenY = garden.length;
         }
-        console.log(window.innerWidth);
+
         let w = window.innerWidth - window.innerWidth % cS;
         let h = window.innerHeight - window.innerHeight % cS;
         
@@ -76,12 +76,16 @@ class Canvas extends React.Component
             zoom = zoom <= ( gardenY / (h / cS) ) ? gardenY / (h / cS) : zoom; 
         }
 
+
+
         let x = new Array(gardenY);
         for(let i = 0; i < x.length; ++i)
         {
             x[i] = new Array(gardenX);
         }
         
+        console.log(zoom);
+
         await this.setState(
             {
                 width: w,
@@ -92,12 +96,20 @@ class Canvas extends React.Component
             }
         );
 
-
         PlantingApi.getPlantedCrops(this.state.id, this.state.zoom).then(data => 
             {
                 this.drawGarden(data);
             }
         );
+
+    }
+
+    async componentDidMount() 
+    {  
+        await this.calculateGridSize();
+
+        window.addEventListener("resize", this.calculateGridSize);
+
         CropApi.getAllCrops()
             .then(data => 
                     {
@@ -121,6 +133,11 @@ class Canvas extends React.Component
                         console.log(this.state.images);
                     }
                 );
+    }
+
+    componentWillUnmount()
+    {
+        window.removeEventListener("resize", this.calculateGridSize());
     }
 
     drawGrid()
@@ -156,6 +173,7 @@ class Canvas extends React.Component
         {
             if(data[i])
             {
+                //i hope one day i will write code that doesn't make me cry the next time i look at it...
                 let xsize = data[i].endPoint.x - data[i].startPoint.x;
                 let ysize = data[i].endPoint.y - data[i].startPoint.y;
                 let imageObj = new Image();
@@ -201,14 +219,14 @@ class Canvas extends React.Component
         this.togglePopup();
         this.planting.crop = crop;
         this.planting.method = "ADDED";
-        PlantingApi.modifyCrops(this.planting, this.state.id).then(data => {this.drawGarden(data)});
+        PlantingApi.modifyCrops(this.planting, this.state.id, this.state.zoom).then(data => {this.drawGarden(data)});
     }
 
     deleteSelected()
     {
         this.togglePopup();
         this.planting.method = "DELETED";
-        PlantingApi.modifyCrops(this.planting, this.state.id).then(data => {this.drawGarden(data)});
+        PlantingApi.modifyCrops(this.planting, this.state.id, this.state.zoom).then(data => {this.drawGarden(data)});
     }
 
     render() 
