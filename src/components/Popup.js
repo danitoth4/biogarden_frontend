@@ -33,7 +33,6 @@ class Popup extends React.Component
         let cropComponents;
         if(this.state.crops)
         {
-            console.log(this.state.crops);
             cropComponents = this.state.crops.map( (crop) =>
                 <Crop key = {crop.id} crop={crop} cropSelected = {this.props.cropSelected}></Crop>
             );
