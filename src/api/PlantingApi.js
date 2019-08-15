@@ -4,26 +4,26 @@ const  SERVER_URL = `${SERVER}/planting`;
 
 export default class PlantingAPi
 {
-    static async getPlantedCrops(id, zoom)
+    static async getPlantedCrops(id, zoom, startX, startY, endX, endY)
     {
         const options = 
         {
             method: "get"
         };
 
-        return fetch(`${SERVER_URL}/${id}?zoomS=${zoom}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => response.json());
 
     }
 
-    static async modifyCrops(plantingOperation, id, zoom)
+    static async modifyCrops(plantingOperation, id, zoom, startX, startY, endX, endY)
     {
         if(plantingOperation.method === "ADDED")
-            return this.plantCrops(plantingOperation, id, zoom);
+            return this.plantCrops(plantingOperation, id, zoom, startX, startY, endX, endY);
         else
-            return this.deleteCrops(plantingOperation, id, zoom);
+            return this.deleteCrops(plantingOperation, id, zoom, startX, startY, endX, endY);
     }
 
-    static async plantCrops(plantingOperation, id, zoom)
+    static async plantCrops(plantingOperation, id, zoom, startX, startY, endX, endY)
     {
         let headers = new Headers();
         headers.append('Content-Type','application/json');
@@ -33,10 +33,10 @@ export default class PlantingAPi
             headers: headers,
             body: JSON.stringify(plantingOperation)
         };
-        return fetch(`${SERVER_URL}/${id}?zoomS=${zoom}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => response.json());
     }
  
-    static async deleteCrops(plantingOperation, id, zoom)
+    static async deleteCrops(plantingOperation, id, zoom, startX, startY, endX, endY)
     {
         let headers = new Headers();
         headers.append('Content-Type','application/json');
@@ -46,6 +46,6 @@ export default class PlantingAPi
             headers: headers,
             body: JSON.stringify(plantingOperation)
         };
-        return fetch(`${SERVER_URL}/${id}?zoomS=${zoom}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => response.json());
     }
 }
