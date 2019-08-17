@@ -11,6 +11,7 @@ export default class GardenListItem extends React.Component
 
     render()
     {
+        console.log(this.props);
         return(
             <Link to = {{
                     pathname: `/garden/${this.props.id}`,
