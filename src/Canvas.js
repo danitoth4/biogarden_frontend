@@ -22,6 +22,7 @@ class Canvas extends React.Component {
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
         this.calculateGridSize = this.calculateGridSize.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
     }
 
     togglePopup() {
@@ -174,6 +175,7 @@ class Canvas extends React.Component {
 
         if (this.refs.canvas) {
             this.refs.canvas.addEventListener("wheel", (e) => this.updateZoom(e.deltaY));
+            document.addEventListener("keydown", (e) => this.handleKeyDown(e));
         }
     }
 
@@ -181,13 +183,8 @@ class Canvas extends React.Component {
         this.refs.canvas.removeEventListener("wheel", (e) => this.updateZoom(e.deltaY));
     }
 
-    drawGrid() {
-        const canvas = this.refs.canvas;
-        //HACK :(
-        if (!canvas)
-            return;
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGrid(ctx) {
+        ctx.clearRect(0, 0, this.state.cellsX * this.state.cellSize, this.state.cellsY * this.state.cellSize);
         ctx.beginPath();
         ctx.setLineDash([2, 5,]);
         
@@ -206,12 +203,17 @@ class Canvas extends React.Component {
     }
 
     drawGarden(data) {
-        this.drawGrid();
+        /*var canvas2 = document.createElement("canvas");
+        canvas2.width = this.state.cellsX * this.state.cellSize;
+        canvas2.height = this.state.cellsY * this.state.cellSize;
+        var context2 = canvas2.getContext("2d");*/
         const canvas = this.refs.canvas;
         //HACK :(
         if (!canvas)
             return;
         const ctx = canvas.getContext("2d");
+        ctx.save();
+        this.drawGrid(ctx);
         /*for (let i = 0; i < data.length; ++i) {
             for (let x = data[i].startX; x < data[i].endX; ++x) {
                 for (let y = data[i].startY; y < data[i].endY; ++y) {
@@ -234,10 +236,76 @@ class Canvas extends React.Component {
                 imageObj.src = this.state.images[data[i].cropTypeId];
             }
         }
+        //ctx.drawImage(canvas2, 0, 0);
+        ctx.restore();
         this.setState({drawn: true});
     }
 
+    moveGrid(x, y)
+    {
+        let step = Math.floor(this.state.zoom);
+        if(x > 0)
+        {
+            if(this.state.bottomRight.x + step > this.state.gardenX)
+                step = this.state.gardenX - this.state.bottomRight.x;
+        }
+        if(x < 0)
+        {
+            if(this.state.topLeft.x - step < 0)
+                step = this.state.topLeft.x;
+        }
+        if(y > 0)
+        {
+            if(this.state.bottomRight.y + step > this.state.gardenY)
+                step = this.state.gardenY - this.state.bottomRight.y;
+        }
+        if(y < 0)
+        {
+            if(this.state.topLeft.y - step < 0)
+                step = this.state.topLeft.y;
+        }
+        if(step === 0)
+            return;
+        console.log(step, x, y);
+        this.setState(prevState => {
+                return{
+                    drawn: false,
+                    topLeft: {
+                        x: prevState.topLeft.x + x * step,
+                        y: prevState.topLeft.y + y * step
+                    },
+                    bottomRight: {
+                        x: prevState.bottomRight.x + x * step,
+                        y: prevState.bottomRight.y + y * step
+                    }
+                };
+        }, () => PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
+            this.drawGarden(data);
+        }) 
+        
+        );
+    }
+
     //event handlers
+
+    handleKeyDown(e) {
+        switch(e.code)
+        {
+            case "ArrowUp":
+                this.moveGrid(0, -1);
+                break;
+            case "ArrowDown":
+                this.moveGrid(0, 1);
+                break;
+            case "ArrowLeft":
+                this.moveGrid(-1, 0);
+                break;
+            case "ArrowRight":
+                this.moveGrid(1, 0);
+                break;
+            default: return;
+        }
+    }
 
     handleMouseDown(e) {
         this.planting.x1 = this.convertToGardenCoordinate(e.clientX);
@@ -285,13 +353,13 @@ class Canvas extends React.Component {
     }
 
     render() {
-        if(!this.state.topLeft || !this.state.bottomRight)
+        if(!this.state.cellsX || !this.state.cellsY)
             return(<h1>Loading...</h1>);
         const styles =
         {
             border: "10px solid",
             backgroundColor: "#10d035", //light green
-            visibility: this.state.drawn ? "visible" : "hidden"
+            //visibility: this.state.drawn ? "visible" : "hidden"
 
         }
 
