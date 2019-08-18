@@ -32,7 +32,7 @@ class Canvas extends React.Component {
     }
 
     async calculateGridSize() {
-        let cS = 30;
+        let cS = 40;
         let gardenX, gardenY;
         if (this.props.location.state && this.props.location.state.width && this.props.location.state.length) {
             gardenX = this.props.location.state.width;
@@ -95,41 +95,36 @@ class Canvas extends React.Component {
     } 
 
     updateZoom(delta) {
-        console.log(this.state);
-        let newZoom = this.state.zoom + (delta < 0 ? -0.3 : 0.3 );
+        let zoomSpeed = 0.05;
+        let newZoom = this.state.zoom + (delta < 0 ? -zoomSpeed : zoomSpeed );
         if(newZoom < 1)
         {
             newZoom = 1;
             if(this.state.zoom === 1)
                 return;
         }
-        else if (newZoom >= this.state.maxZoom)
+        else if (newZoom >= this.state.maxZoom + zoomSpeed)
         {
             return;
         }
         let cellsX, cellsY;
-        console.log(newZoom)
         //setting new width
-        if(newZoom * this.state.maxCellsX <= this.state.displayableX)
+        if( this.state.gardenX / newZoom <= this.state.displayableX)
         {
-            cellsX = this.state.gardenX / newZoom >= this.state.displayableX ? this.state.displayableX : this.state.gardenX / newZoom;
-            console.log(1);
+            cellsX = this.state.gardenX / newZoom;
         }
         else
         {
-            cellsX = this.state.maxCellsX * newZoom < this.state.gardenX ? this.state.maxCellsX  : this.state.gardenX;
-            console.log(2);
+            cellsX = this.state.displayableX;
         }
         //setting new length
-        if(newZoom * this.state.maxCellsY <= this.state.displayableY)
+        if( this.state.gardenY / newZoom <= this.state.displayableY)
         {
-            cellsY = this.state.gardenY / newZoom >= this.state.displayableY ? this.state.displayableY : this.state.gardenY / newZoom;
-            console.log(3);
+            cellsY = this.state.gardenY / newZoom;
         }
         else
         {
-            cellsY = this.state.maxCellsY * newZoom < this.state.gardenY ? this.state.maxCellsY  : this.state.gardenY;
-            console.log(4);
+            cellsY = this.state.displayableY;
         }
         //setting everything
         this.setState(prevState => {
@@ -143,9 +138,9 @@ class Canvas extends React.Component {
                 }
             }
         },
-            () => {console.log(this.state); PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
+            () => PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
                 this.drawGarden(data);
-            }) }
+            }) 
         );
     }
 
