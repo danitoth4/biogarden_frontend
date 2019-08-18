@@ -17,6 +17,10 @@ export default class PlantingAPi
 
     static async modifyCrops(plantingOperation, id, zoom, startX, startY, endX, endY)
     {
+        plantingOperation.x1 =  Math.round(plantingOperation.x1 * zoom) + startX;
+        plantingOperation.y1 =  Math.round(plantingOperation.y1 * zoom) + startY;
+        plantingOperation.x2 =  Math.round(plantingOperation.x2 * zoom) + startX;
+        plantingOperation.y2 =  Math.round(plantingOperation.y2 * zoom) + startY;
         if(plantingOperation.method === "ADDED")
             return this.plantCrops(plantingOperation, id, zoom, startX, startY, endX, endY);
         else

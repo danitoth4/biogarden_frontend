@@ -15,7 +15,8 @@ class Canvas extends React.Component {
                 grid: null,
                 images: {},
                 showPopup: false,
-                zoom: null
+                zoom: null,
+                drawn: false
             };
         this.planting = {};
         this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -127,16 +128,23 @@ class Canvas extends React.Component {
     }
 
     updateZoom(delta) {
+        if(!this.state.drawn)
+            return;
+        this.setState({drawn: false});
         let zoomSpeed = 0.5;
         let newZoom = this.state.zoom + (delta < 0 ? -zoomSpeed : zoomSpeed );
         if(newZoom < 1)
         {
             newZoom = 1;
             if(this.state.zoom === 1)
+            {
+                this.setState({drawn: true});
                 return;
+            }
         }
         else if (newZoom >= this.state.maxZoom + zoomSpeed)
         {
+            this.setState({drawn: true});
             return;
         }
         this.applyZoom(newZoom);
@@ -226,6 +234,7 @@ class Canvas extends React.Component {
                 imageObj.src = this.state.images[data[i].cropTypeId];
             }
         }
+        this.setState({drawn: true});
     }
 
     //event handlers
@@ -236,8 +245,24 @@ class Canvas extends React.Component {
     }
 
     handleMouseUp(e) {
-        this.planting.x2 = this.convertToGardenCoordinate(e.clientX) + 1;
-        this.planting.y2 = this.convertToGardenCoordinate(e.clientY) + 1;
+        this.planting.x2 = this.convertToGardenCoordinate(e.clientX);
+        this.planting.y2 = this.convertToGardenCoordinate(e.clientY);
+        if(this.planting.x2 > this.planting.x1)
+        {
+            this.planting.x2++;
+        }
+        else
+        {
+            this.planting.x1++;
+        }
+        if(this.planting.y2 > this.planting.y1)
+        {
+            this.planting.y2++;
+        }
+        else
+        {
+            this.planting.y1++;
+        }
         this.togglePopup();
     }
 
@@ -246,6 +271,7 @@ class Canvas extends React.Component {
     }
 
     cropSelected(crop) {
+        console.log(this.state);
         this.togglePopup();
         this.planting.crop = crop;
         this.planting.method = "ADDED";
@@ -265,6 +291,7 @@ class Canvas extends React.Component {
         {
             border: "10px solid",
             backgroundColor: "#10d035", //light green
+            visibility: this.state.drawn ? "visible" : "hidden"
 
         }
 
