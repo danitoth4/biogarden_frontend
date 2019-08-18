@@ -44,8 +44,8 @@ class Canvas extends React.Component {
             gardenY = garden.length;
         }
 
-        let w = window.innerWidth - window.innerWidth % cS;
-        let h = window.innerHeight - window.innerHeight % cS;
+        let w = (window.innerWidth - cS) - window.innerWidth % cS;
+        let h = (window.innerHeight - cS) - window.innerHeight % cS;
         let maxCellsX = w / cS;
         let maxCellsY = h / cS;
         console.log(maxCellsX, maxCellsY);
@@ -82,8 +82,8 @@ class Canvas extends React.Component {
                 maxCellsY: maxCellsY, // how many cells are displayed
                 cellSize: cS, //how many pixels is a cell
                 grid: x,
-                displayableX: w, //how many cells can fit on the screen
-                displayableY: h, //how many cells can fit on the screen
+                displayableX: w / cS, //how many cells can fit on the screen
+                displayableY: h / cS, //how many cells can fit on the screen
                 gardenX: gardenX, //how wide the garden is
                 gardenY: gardenY, //how long the garden is
                 topLeft: { x: 0, y: 0 }, //the garden coordinates of the cell in the top left corner
@@ -95,7 +95,8 @@ class Canvas extends React.Component {
     } 
 
     updateZoom(delta) {
-        let newZoom = this.state.zoom + (delta > 0 ? -0.03 : 0.03 );
+        console.log(this.state);
+        let newZoom = this.state.zoom + (delta < 0 ? -0.3 : 0.3 );
         if(newZoom < 1)
         {
             newZoom = 1;
@@ -106,20 +107,45 @@ class Canvas extends React.Component {
         {
             return;
         }
-
+        let cellsX, cellsY;
+        console.log(newZoom)
+        //setting new width
+        if(newZoom * this.state.maxCellsX <= this.state.displayableX)
+        {
+            cellsX = this.state.gardenX / newZoom >= this.state.displayableX ? this.state.displayableX : this.state.gardenX / newZoom;
+            console.log(1);
+        }
+        else
+        {
+            cellsX = this.state.maxCellsX * newZoom < this.state.gardenX ? this.state.maxCellsX  : this.state.gardenX;
+            console.log(2);
+        }
+        //setting new length
+        if(newZoom * this.state.maxCellsY <= this.state.displayableY)
+        {
+            cellsY = this.state.gardenY / newZoom >= this.state.displayableY ? this.state.displayableY : this.state.gardenY / newZoom;
+            console.log(3);
+        }
+        else
+        {
+            cellsY = this.state.maxCellsY * newZoom < this.state.gardenY ? this.state.maxCellsY  : this.state.gardenY;
+            console.log(4);
+        }
         //setting everything
         this.setState(prevState => {
             return{
                 zoom: newZoom,
+                maxCellsX: Math.floor(cellsX),
+                maxCellsY: Math.floor(cellsY),
                 bottomRight:{
-                    x: Math.floor(prevState.topLeft.x + (this.state.maxCellsX  * newZoom)),
-                    y: Math.floor(prevState.topLeft.y + (this.state.maxCellsY * newZoom))
+                    x: Math.floor(prevState.topLeft.x + (cellsX  * newZoom)),
+                    y: Math.floor(prevState.topLeft.y + (cellsY * newZoom))
                 }
             }
         },
-            () => PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
+            () => {console.log(this.state); PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
                 this.drawGarden(data);
-            }) 
+            }) }
         );
     }
 
