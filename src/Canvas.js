@@ -46,42 +46,33 @@ class Canvas extends React.Component {
 
         let w = (window.innerWidth - cS) - window.innerWidth % cS;
         let h = (window.innerHeight - cS) - window.innerHeight % cS;
-        let maxCellsX = w / cS;
-        let maxCellsY = h / cS;
-        console.log(maxCellsX, maxCellsY);
+        let cellsX = w / cS;
+        let cellsY = h / cS;
+        console.log(cellsX, cellsY);
         // set default zoom 
         let zoom = 1.0;
 
         // if the window size divided by the cell size is bigger than the number of gardens cells then we are fine otherwise we have to set the zoom to the fraction
-        if (maxCellsX > gardenX)
-            maxCellsX = gardenX;
+        if (cellsX > gardenX)
+            cellsX = gardenX;
         else {
-            zoom = gardenX / (maxCellsX);
+            zoom = gardenX / cellsX;
+            console.log(zoom);
         }
 
-        if (maxCellsY > gardenY)
+        if (cellsY > gardenY)
         {
-            maxCellsY = gardenY;
-            maxCellsY = Math.floor(maxCellsY / zoom);
+            cellsY = gardenY;
         }
         else {
             //bigger zoom wins so that everything  fits on the screen
-            zoom = zoom <= (gardenY / maxCellsY) ? gardenY / maxCellsY : zoom;
-            maxCellsX = Math.floor(maxCellsX / zoom);
+            zoom = zoom <= (gardenY / cellsY) ? gardenY / cellsY : zoom;
         }
 
-
-        let x = new Array(maxCellsY);
-        for (let i = 0; i < x.length; ++i) {
-            x[i] = new Array(maxCellsX);
-        }
-
+        zoom = Math.ceil(zoom);
         await this.setState(
             {
-                maxCellsX: maxCellsX, //how many cells are displayed
-                maxCellsY: maxCellsY, // how many cells are displayed
                 cellSize: cS, //how many pixels is a cell
-                grid: x,
                 displayableX: w / cS, //how many cells can fit on the screen
                 displayableY: h / cS, //how many cells can fit on the screen
                 gardenX: gardenX, //how wide the garden is
@@ -90,23 +81,12 @@ class Canvas extends React.Component {
                 bottomRight: { x: gardenX, y: gardenY }, //the garden coordinates of the cell in the bottom right corner
                 zoom: zoom, // git history tells a story :)
                 maxZoom: zoom
-            }
+            }, () => this.applyZoom(zoom)
         );
     } 
 
-    updateZoom(delta) {
-        let zoomSpeed = 0.05;
-        let newZoom = this.state.zoom + (delta < 0 ? -zoomSpeed : zoomSpeed );
-        if(newZoom < 1)
-        {
-            newZoom = 1;
-            if(this.state.zoom === 1)
-                return;
-        }
-        else if (newZoom >= this.state.maxZoom + zoomSpeed)
-        {
-            return;
-        }
+    applyZoom(newZoom)
+    {
         let cellsX, cellsY;
         //setting new width
         if( this.state.gardenX / newZoom <= this.state.displayableX)
@@ -127,58 +107,70 @@ class Canvas extends React.Component {
             cellsY = this.state.displayableY;
         }
         //setting everything
-        this.setState(prevState => {
-            return{
+        let brx = Math.floor(this.state.topLeft.x + cellsX * newZoom);
+        let bry = Math.floor(this.state.topLeft.y + cellsY * newZoom);
+        cellsX = Math.floor(cellsX);
+        cellsY = Math.floor(cellsY);
+        this.setState({
                 zoom: newZoom,
-                maxCellsX: Math.floor(cellsX),
-                maxCellsY: Math.floor(cellsY),
+                cellsX: cellsX,
+                cellsY: cellsY,
                 bottomRight:{
-                    x: Math.floor(prevState.topLeft.x + (cellsX  * newZoom)),
-                    y: Math.floor(prevState.topLeft.y + (cellsY * newZoom))
-                }
-            }
-        },
-            () => PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
-                this.drawGarden(data);
-            }) 
+                    x: brx,
+                    y: bry
+                }           
+            },
+                () => PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
+                    this.drawGarden(data);
+                }) 
         );
+    }
+
+    updateZoom(delta) {
+        let zoomSpeed = 0.5;
+        let newZoom = this.state.zoom + (delta < 0 ? -zoomSpeed : zoomSpeed );
+        if(newZoom < 1)
+        {
+            newZoom = 1;
+            if(this.state.zoom === 1)
+                return;
+        }
+        else if (newZoom >= this.state.maxZoom + zoomSpeed)
+        {
+            return;
+        }
+        this.applyZoom(newZoom);
     }
 
     async componentDidMount() {
+        //getting the images
+        CropApi.getAllCrops()
+        .then(data => {
+            for (let i = 0; i < data.length; ++i) {
+                this.setState((prevState) => {
+                    if (data[i].id in prevState.images) {
+                        return prevState;
+                    }
+
+                    var imgs = prevState.images;
+                    imgs[data[i].id] = data[i].imageUrl;
+                    return {
+                        images: imgs
+                    }
+                }
+                );
+            }
+        }
+        );
         await this.calculateGridSize();
 
-        window.addEventListener("resize", this.calculateGridSize);
         if (this.refs.canvas) {
             this.refs.canvas.addEventListener("wheel", (e) => this.updateZoom(e.deltaY));
         }
-
-        CropApi.getAllCrops()
-            .then(data => {
-                for (let i = 0; i < data.length; ++i) {
-                    this.setState((prevState) => {
-                        if (data[i].id in prevState.images) {
-                            return prevState;
-                        }
-
-                        var imgs = prevState.images;
-                        imgs[data[i].id] = data[i].imageUrl;
-                        return {
-                            images: imgs
-                        }
-                    }
-                    );
-                }
-            }
-            );
-
-        PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
-            this.drawGarden(data);
-        }
-        );
     }
 
     componentWillUnmount() {
-        window.removeEventListener("resize", this.calculateGridSize());
+        this.refs.canvas.removeEventListener("wheel", (e) => this.updateZoom(e.deltaY));
     }
 
     drawGrid() {
@@ -191,16 +183,16 @@ class Canvas extends React.Component {
         ctx.beginPath();
         ctx.setLineDash([2, 5,]);
         
-        for(let i = 0; i  < this.state.maxCellsY; ++i)
+        for(let i = 0; i  < this.state.cellsY; ++i)
         {
             ctx.moveTo(0, i * this.state.cellSize);
-            ctx.lineTo(this.state.maxCellsX * this.state.cellSize, i * this.state.cellSize);
+            ctx.lineTo(this.state.cellsX * this.state.cellSize, i * this.state.cellSize);
             ctx.stroke();
         }
-        for(let i = 0; i < this.state.maxCellsX ; ++i)
+        for(let i = 0; i < this.state.cellsX ; ++i)
         {
             ctx.moveTo(i * this.state.cellSize, 0);
-            ctx.lineTo(i * this.state.cellSize, this.state.maxCellsY * this.state.cellSize);
+            ctx.lineTo(i * this.state.cellSize, this.state.cellsY * this.state.cellSize);
             ctx.stroke();
         }
     }
@@ -212,13 +204,13 @@ class Canvas extends React.Component {
         if (!canvas)
             return;
         const ctx = canvas.getContext("2d");
-        for (let i = 0; i < data.length; ++i) {
+        /*for (let i = 0; i < data.length; ++i) {
             for (let x = data[i].startX; x < data[i].endX; ++x) {
                 for (let y = data[i].startY; y < data[i].endY; ++y) {
                     this.state.grid[y][x] = data[i];
                 }
             }
-        }
+        }*/
         for (let i = 0; i < data.length; ++i) {
             if (data[i]) {
                 //i hope one day i will write code that doesn't make me cry the next time i look at it...
@@ -280,7 +272,7 @@ class Canvas extends React.Component {
 
         return (
             <div>
-                <canvas ref="canvas" width={this.state.maxCellsX * this.state.cellSize} height={this.state.maxCellsY * this.state.cellSize} style={styles} onMouseDown={e => this.handleMouseDown(e)} onMouseUp={e => this.handleMouseUp(e)} />
+                <canvas ref="canvas" width={this.state.cellsX * this.state.cellSize} height={this.state.cellsY * this.state.cellSize} style={styles} onMouseDown={e => this.handleMouseDown(e)} onMouseUp={e => this.handleMouseUp(e)} />
                 {this.state.showPopup ?
                     <Popup text='Close Me' closePopup={this.togglePopup.bind(this)} cropSelected={this.cropSelected.bind(this)} deleteSelected={this.deleteSelected.bind(this)} cropData={CropApi.getAllCrops()} />
                     : null
