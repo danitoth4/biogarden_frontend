@@ -50,7 +50,6 @@ class Canvas extends React.Component {
         let h = (window.innerHeight - cS) - window.innerHeight % cS;
         let cellsX = w / cS;
         let cellsY = h / cS;
-        console.log(cellsX, cellsY);
         // set default zoom 
         let zoom = 1.0;
 
@@ -59,7 +58,6 @@ class Canvas extends React.Component {
             cellsX = gardenX;
         else {
             zoom = gardenX / cellsX;
-            console.log(zoom);
         }
 
         if (cellsY > gardenY)
@@ -109,10 +107,32 @@ class Canvas extends React.Component {
             cellsY = this.state.displayableY;
         }
         //setting everything
-        let brx = Math.floor(this.state.topLeft.x + cellsX * newZoom);
-        let bry = Math.floor(this.state.topLeft.y + cellsY * newZoom);
-        cellsX = Math.floor(cellsX);
-        cellsY = Math.floor(cellsY);
+        console.log(cellsX, cellsY);
+        let brx = Math.floor(this.state.topLeft.x + cellsX * newZoom);      
+        if(brx > this.state.gardenX)
+        {
+            cellsX = Math.floor((this.state.gardenX - this.state.topLeft.x) / newZoom);
+            brx = this.state.gardenX;
+            console.log("wau");
+        }
+        else
+        {
+            cellsX = Math.floor(cellsX);
+        }
+        let bry = Math.floor(this.state.topLeft.y + cellsY * newZoom);      
+        if(bry > this.state.gardenY)
+        {
+            cellsY = Math.floor((this.state.gardenY - this.state.topLeft.y) / newZoom);
+            bry = this.state.gardenY;
+            console.log("wau");
+        }
+        else
+        {
+            cellsY = Math.floor(cellsY);
+        }
+        console.log(cellsX, cellsY);
+        //let bry = Math.floor(this.state.topLeft.y + cellsY * newZoom);
+        //cellsY = Math.floor(cellsY);
         this.setState({
                 zoom: newZoom,
                 cellsX: cellsX,
@@ -243,7 +263,8 @@ class Canvas extends React.Component {
 
     moveGrid(x, y)
     {
-        let step = Math.floor(this.state.zoom);
+        let step = Math.floor(this.state.zoom);       
+        let xGrowth = 0, yGrowth = 0;
         if(x > 0)
         {
             if(this.state.bottomRight.x + step > this.state.gardenX)
@@ -266,8 +287,13 @@ class Canvas extends React.Component {
         }
         if(step === 0)
             return;
-        console.log(step, x, y);
+        //see if the grid can grow...
+        if(this.state.cellsX < this.state.displayableX)
+            xGrowth = x;
+        if(this.state.cellsY < this.state.displayableY)    
+            yGrowth = y;
         this.setState(prevState => {
+            if(xGrowth === 0 && yGrowth === 0)
                 return{
                     drawn: false,
                     topLeft: {
@@ -278,6 +304,20 @@ class Canvas extends React.Component {
                         x: prevState.bottomRight.x + x * step,
                         y: prevState.bottomRight.y + y * step
                     }
+                };
+            else
+                return{
+                    drawn: false,
+                    topLeft:{
+                        x: xGrowth === 1 ? prevState.topLeft.x : prevState.topLeft.x + x * step,
+                        y: yGrowth === 1 ? prevState.topLeft.y : prevState.topLeft.y + y * step
+                    },
+                    bottomRight: {
+                        x: xGrowth === -1 ? prevState.bottomRight.x : prevState.bottomRight.x + x * step,
+                        y: yGrowth === -1 ? prevState.bottomRight.y : prevState.bottomRight.y + y * step
+                    },
+                    cellsX: prevState.cellsX + (xGrowth === 0 ? 0 : 1),
+                    cellsY: prevState.cellsY + (yGrowth === 0 ? 0 : 1)
                 };
         }, () => PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
             this.drawGarden(data);
@@ -315,7 +355,7 @@ class Canvas extends React.Component {
     handleMouseUp(e) {
         this.planting.x2 = this.convertToGardenCoordinate(e.clientX);
         this.planting.y2 = this.convertToGardenCoordinate(e.clientY);
-        if(this.planting.x2 > this.planting.x1)
+        if(this.planting.x2 >= this.planting.x1)
         {
             this.planting.x2++;
         }
@@ -323,7 +363,7 @@ class Canvas extends React.Component {
         {
             this.planting.x1++;
         }
-        if(this.planting.y2 > this.planting.y1)
+        if(this.planting.y2 >= this.planting.y1)
         {
             this.planting.y2++;
         }
@@ -339,7 +379,6 @@ class Canvas extends React.Component {
     }
 
     cropSelected(crop) {
-        console.log(this.state);
         this.togglePopup();
         this.planting.crop = crop;
         this.planting.method = "ADDED";
@@ -359,12 +398,7 @@ class Canvas extends React.Component {
         {
             border: "10px solid",
             backgroundColor: "#10d035", //light green
-            //visibility: this.state.drawn ? "visible" : "hidden"
-
         }
-
-        //console.log(this.state);
-
         return (
             <div>
                 <canvas ref="canvas" width={this.state.cellsX * this.state.cellSize} height={this.state.cellsY * this.state.cellSize} style={styles} onMouseDown={e => this.handleMouseDown(e)} onMouseUp={e => this.handleMouseUp(e)} />
