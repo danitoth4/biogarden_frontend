@@ -1,4 +1,5 @@
 import {SERVER} from "./ServerUrl";
+import ResponseHandler from './ResponseHandler';
 
 const SERVER_URL = `${SERVER}/companions`
 
@@ -10,7 +11,7 @@ class CompanionApi
             method: "get"
         }
 
-        return fetch(SERVER_URL, options).then(response => response.json());
+        return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));
     }
 
     static async getCompanions(id)
@@ -19,7 +20,7 @@ class CompanionApi
             method: "get"
         };
 
-        return fetch(`${SERVER_URL}/${id}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}`, options).then(response => ResponseHandler.handle(response));
     }
 
     static async addCompanions(companions)
@@ -31,7 +32,7 @@ class CompanionApi
             headers: headers,
             body: JSON.stringify(companions)
         };
-        return fetch(SERVER_URL, options).then();
+        return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));
     }
 
     static async deleteCompanions(companions)
@@ -43,7 +44,7 @@ class CompanionApi
             headers: headers,
             body: JSON.stringify(companions)
         };
-        return fetch(SERVER_URL, options).then();
+        return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));
     }
 }
 export default CompanionApi;

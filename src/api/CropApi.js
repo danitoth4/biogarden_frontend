@@ -1,4 +1,5 @@
 import {SERVER} from "./ServerUrl";
+import ResponseHandler from './ResponseHandler';
 
 
 const SERVER_URL = `${SERVER}/crop`;
@@ -13,7 +14,7 @@ class CropApi
             method: "get"
         };
 
-        return fetch(SERVER_URL, options).then(response => response.json());
+        return fetch(SERVER_URL, options).then(response =>  ResponseHandler.handle(response));
     }
 
     static async getCrop(id)
@@ -22,7 +23,7 @@ class CropApi
         {
             method: "get"
         };
-        return fetch(`${SERVER_URL}/${id}`, options).then(response =>response.json())
+        return fetch(`${SERVER_URL}/${id}`, options).then(response =>  ResponseHandler.handle(response))
     }
 
     static async deleteCrop(cropId)
@@ -32,7 +33,7 @@ class CropApi
             method: "delete"
         }
 
-        return fetch(`${SERVER_URL}/${cropId}`, options);
+        return fetch(`${SERVER_URL}/${cropId}`, options).then(response => ResponseHandler.handle(response));
     }
 }
 

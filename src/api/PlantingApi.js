@@ -1,4 +1,5 @@
 import {SERVER} from "./ServerUrl";
+import ResponseHandler from './ResponseHandler';
 
 const  SERVER_URL = `${SERVER}/planting`;
 
@@ -11,7 +12,7 @@ export default class PlantingAPi
             method: "get"
         };
 
-        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => ResponseHandler.handle(response));
 
     }
 
@@ -37,7 +38,7 @@ export default class PlantingAPi
             headers: headers,
             body: JSON.stringify(plantingOperation)
         };
-        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => ResponseHandler.handle(response));
     }
  
     static async deleteCrops(plantingOperation, id, zoom, startX, startY, endX, endY)
@@ -50,6 +51,6 @@ export default class PlantingAPi
             headers: headers,
             body: JSON.stringify(plantingOperation)
         };
-        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => ResponseHandler.handle(response));
     }
 }

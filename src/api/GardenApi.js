@@ -1,4 +1,5 @@
 import {SERVER} from "./ServerUrl";
+import ResponseHandler from './ResponseHandler';
 
 const SERVER_URL = `${SERVER}/garden`
 
@@ -11,7 +12,7 @@ export default class GardenApi
             method: "get"
         };
 
-        return fetch(SERVER_URL, options).then(response => response.json());
+        return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));
     }
 
     static async getGarden(id)
@@ -21,7 +22,7 @@ export default class GardenApi
             method: "get"
         };
 
-        return fetch(`${SERVER_URL}/${id}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}`, options).then(response => ResponseHandler.handle(response));
     }
 
     static async createGarden(garden)
@@ -35,7 +36,7 @@ export default class GardenApi
             body: JSON.stringify(garden)
         };
 
-        return fetch(SERVER_URL, options).then(response => response.json());
+        return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));
     }
 
     static async updateGarden(id, garden)
@@ -49,7 +50,7 @@ export default class GardenApi
             body: JSON.stringify(garden)
         };
 
-        return fetch(`${SERVER_URL}/${id}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}`, options).then(response => ResponseHandler.handle(response));
     }
 
     static async deleteGarden(id)
@@ -59,7 +60,7 @@ export default class GardenApi
             method: "delete"
         };
 
-        return fetch(`${SERVER_URL}/${id}`, options).then(response => response.json());
+        return fetch(`${SERVER_URL}/${id}`, options).then(response => ResponseHandler.handle(response));
     }
 
 }
