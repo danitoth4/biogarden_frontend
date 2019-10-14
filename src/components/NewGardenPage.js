@@ -5,11 +5,6 @@ import GardenApi from '../api/GardenApi';
 
 export default class NewGardenPage extends React.Component
 {
-    constructor(props)
-    {
-        super(props);
-    }
-
     render()
     {
         return(

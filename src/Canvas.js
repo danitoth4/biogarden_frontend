@@ -11,6 +11,7 @@ class Canvas extends React.Component {
         this.state =
             {
                 id: this.props.match.params.gardenId,
+                contentId: this.props.match.params.contentId,
                 cellSize: null,
                 grid: null,
                 images: {},
@@ -142,7 +143,7 @@ class Canvas extends React.Component {
                     y: bry
                 }           
             },
-                () => PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
+                () => PlantingApi.getPlantedCrops(this.state.contentId, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
                     this.drawGarden(data);
                 }) 
         );
@@ -223,10 +224,6 @@ class Canvas extends React.Component {
     }
 
     drawGarden(data) {
-        /*var canvas2 = document.createElement("canvas");
-        canvas2.width = this.state.cellsX * this.state.cellSize;
-        canvas2.height = this.state.cellsY * this.state.cellSize;
-        var context2 = canvas2.getContext("2d");*/
         const canvas = this.refs.canvas;
         //HACK :(
         if (!canvas)
@@ -243,7 +240,6 @@ class Canvas extends React.Component {
         }*/
         for (let i = 0; i < data.length; ++i) {
             if (data[i]) {
-                //i hope one day i will write code that doesn't make me cry the next time i look at it...
                 let xsize = data[i].endX - data[i].startX;
                 let ysize = data[i].endY - data[i].startY;
                 let imageObj = new Image();
@@ -256,7 +252,6 @@ class Canvas extends React.Component {
                 imageObj.src = this.state.images[data[i].cropTypeId];
             }
         }
-        //ctx.drawImage(canvas2, 0, 0);
         ctx.restore();
         this.setState({drawn: true});
     }
@@ -319,7 +314,7 @@ class Canvas extends React.Component {
                     cellsX: prevState.cellsX + (xGrowth === 0 ? 0 : 1),
                     cellsY: prevState.cellsY + (yGrowth === 0 ? 0 : 1)
                 };
-        }, () => PlantingApi.getPlantedCrops(this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
+        }, () => PlantingApi.getPlantedCrops(this.state.contentId, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => {
             this.drawGarden(data);
         }) 
         
@@ -382,13 +377,13 @@ class Canvas extends React.Component {
         this.togglePopup();
         this.planting.crop = crop;
         this.planting.method = "ADDED";
-        PlantingApi.modifyCrops(this.planting, this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => { this.drawGarden(data) });
+        PlantingApi.modifyCrops(this.planting, this.state.contentId, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => { this.drawGarden(data) });
     }
 
     deleteSelected() {
         this.togglePopup();
         this.planting.method = "DELETED";
-        PlantingApi.modifyCrops(this.planting, this.state.id, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => { this.drawGarden(data) });
+        PlantingApi.modifyCrops(this.planting, this.state.contentId, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => { this.drawGarden(data) });
     }
 
     render() {
