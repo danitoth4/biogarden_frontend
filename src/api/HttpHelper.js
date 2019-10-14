@@ -2,7 +2,7 @@ import LoginApi from './LoginApi';
 
 var Router = require('react-router');
 
-export default class ResponseHandler
+export class ResponseHandler
 {
     static async handle(response)
     {
@@ -38,4 +38,21 @@ export default class ResponseHandler
         }
         return false;
     }       
+}
+
+export class MyHeaders
+{
+    static getHeaders()
+    {
+        let headers = new Headers();
+        headers.append('Authorization', `Bearer ${sessionStorage.getItem('bearerToken')}`);
+        return headers;
+    }
+
+    static getHeadersWithContentType()
+    {
+        let headers = this.getHeaders();
+        headers.append('Content-Type', 'application/json');
+        return headers;
+    }
 }

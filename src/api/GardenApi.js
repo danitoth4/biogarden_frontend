@@ -1,5 +1,5 @@
 import {SERVER} from "./ServerUrl";
-import ResponseHandler from './ResponseHandler';
+import {ResponseHandler, MyHeaders} from './HttpHelper';
 
 const SERVER_URL = `${SERVER}/garden`
 
@@ -9,6 +9,7 @@ export default class GardenApi
     {
         const options = 
         {
+            headers: MyHeaders.getHeaders(),
             method: "get"
         };
 
@@ -19,6 +20,7 @@ export default class GardenApi
     {
         const options = 
         {
+            headers: MyHeaders.getHeaders(),
             method: "get"
         };
 
@@ -27,12 +29,10 @@ export default class GardenApi
 
     static async createGarden(garden)
     {
-        let headers = new Headers();
-        headers.append("Content-Type", "application/json");
         const options =
         {
             method: "post",
-            headers: headers,
+            headers: MyHeaders.getHeadersWithContentType(),
             body: JSON.stringify(garden)
         };
 
@@ -41,12 +41,10 @@ export default class GardenApi
 
     static async updateGarden(id, garden)
     {
-        let headers = new Headers();
-        headers.append("Content-Type", "application/json");
         const options =
         {
             method: "put",
-            headers: headers,
+            headers: MyHeaders.getHeadersWithContentType(),
             body: JSON.stringify(garden)
         };
 
@@ -57,6 +55,7 @@ export default class GardenApi
     {
         const options = 
         {
+            headers: MyHeaders.getHeaders(),
             method: "delete"
         };
 

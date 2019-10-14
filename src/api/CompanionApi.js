@@ -1,5 +1,5 @@
 import {SERVER} from "./ServerUrl";
-import ResponseHandler from './ResponseHandler';
+import {ResponseHandler, MyHeaders} from './HttpHelper';
 
 const SERVER_URL = `${SERVER}/companions`
 
@@ -8,6 +8,7 @@ class CompanionApi
     static async getAllCompanions()
     {
         const options = {
+            headers: MyHeaders.getHeaders(),
             method: "get"
         }
 
@@ -17,6 +18,7 @@ class CompanionApi
     static async getCompanions(id)
     {
         const options = {
+            headers: MyHeaders.getHeaders(),
             method: "get"
         };
 
@@ -25,11 +27,9 @@ class CompanionApi
 
     static async addCompanions(companions)
     {
-        let headers = new Headers();
-        headers.append("Content-Type", "application/json");
         const options = {
             method: "post",
-            headers: headers,
+            headers: MyHeaders.getHeadersWithContentType(),
             body: JSON.stringify(companions)
         };
         return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));
@@ -37,11 +37,9 @@ class CompanionApi
 
     static async deleteCompanions(companions)
     {
-        let headers = new Headers();
-        headers.append("Content-Type", "application/json");
         const options = {
             method: "delete",
-            headers: headers,
+            headers: MyHeaders.getHeadersWithContentType(),
             body: JSON.stringify(companions)
         };
         return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));

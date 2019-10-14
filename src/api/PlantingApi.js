@@ -1,5 +1,5 @@
 import {SERVER} from "./ServerUrl";
-import ResponseHandler from './ResponseHandler';
+import {ResponseHandler, MyHeaders} from './HttpHelper';
 
 const  SERVER_URL = `${SERVER}/planting`;
 
@@ -30,12 +30,10 @@ export default class PlantingAPi
 
     static async plantCrops(plantingOperation, id, zoom, startX, startY, endX, endY)
     {
-        let headers = new Headers();
-        headers.append('Content-Type','application/json');
         const options =
         {
             method: "post",
-            headers: headers,
+            headers: MyHeaders.getHeadersWithContentType(),
             body: JSON.stringify(plantingOperation)
         };
         return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => ResponseHandler.handle(response));
@@ -43,12 +41,10 @@ export default class PlantingAPi
  
     static async deleteCrops(plantingOperation, id, zoom, startX, startY, endX, endY)
     {
-        let headers = new Headers();
-        headers.append('Content-Type','application/json');
         const options =
         {
             method: "delete",
-            headers: headers,
+            headers: MyHeaders.getHeadersWithContentType(),
             body: JSON.stringify(plantingOperation)
         };
         return fetch(`${SERVER_URL}/${id}?zoom=${zoom}&startX=${startX}&startY=${startY}&endX=${endX}&endY=${endY}`, options).then(response => ResponseHandler.handle(response));

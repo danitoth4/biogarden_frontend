@@ -1,5 +1,5 @@
 import {SERVER} from "./ServerUrl";
-import ResponseHandler from './ResponseHandler';
+import {ResponseHandler, MyHeaders} from './HttpHelper';
 
 
 const SERVER_URL = `${SERVER}/crop`;
@@ -11,16 +11,18 @@ class CropApi
     {
         const options = 
         {
+            headers: MyHeaders.getHeaders(),
             method: "get"
         };
 
-        return fetch(SERVER_URL, options).then(response =>  ResponseHandler.handle(response));
+        return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));
     }
 
     static async getCrop(id)
     {
         const options =
         {
+            headers: MyHeaders.getHeaders(),
             method: "get"
         };
         return fetch(`${SERVER_URL}/${id}`, options).then(response =>  ResponseHandler.handle(response))
@@ -30,6 +32,7 @@ class CropApi
     {
         const options =
         {
+            headers: MyHeaders.getHeaders(),
             method: "delete"
         }
 
