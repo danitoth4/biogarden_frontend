@@ -9,6 +9,7 @@ export default class PlantingAPi
     {
         const options = 
         {
+            headers: MyHeaders.getHeaders(),
             method: "get"
         };
 

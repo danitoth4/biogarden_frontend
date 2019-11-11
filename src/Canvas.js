@@ -374,8 +374,8 @@ class Canvas extends React.Component {
     }
 
     cropSelected(crop) {
-        this.togglePopup();
-        this.planting.crop = crop;
+        this.togglePopup();        
+        this.planting.cropId = crop.id;
         this.planting.method = "ADDED";
         PlantingApi.modifyCrops(this.planting, this.state.contentId, this.state.zoom, this.state.topLeft.x, this.state.topLeft.y, this.state.bottomRight.x, this.state.bottomRight.y).then(data => { this.drawGarden(data) });
     }
