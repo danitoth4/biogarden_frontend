@@ -16,7 +16,6 @@ class CropEditPage extends React.Component
             companions: null,
             otherCrops: null
         };
-        console.log(this.props)
     }
 
     componentDidMount()
@@ -58,24 +57,19 @@ class CropEditPage extends React.Component
         );
     }
 
-    handleSave()
-    {
-
-    }
-
-    onCompanionRemove(id, isPositive)
+    onCompanionRemove(id)
     {
         this.setState(prevState => { return({
-                companions: prevState.companions.filter(cmp => cmp.cropId2 !== id)
+                companions: prevState.companions.filter(cmp => cmp.id !== id)
             }); }
             );
-        CompanionApi.deleteCompanions([{cropId1: this.state.cropData.id, cropId2: id, positive: isPositive}]).then(() => this.refillCompanions());        
+        CompanionApi.deleteCompanion(id).then(() => this.refillCompanions());        
     }
 
     onCompanionAdded(name, isPositive)
     {
-        let id = this.state.otherCrops.filter(c => c.name === name)[0].id;
-        CompanionApi.addCompanions([{cropId1: this.state.cropData.id, cropId2: id, positive: isPositive}]).then(() => this.refillCompanions());            
+        let impacting = this.state.otherCrops.filter(c => c.name === name)[0];
+        CompanionApi.addCompanion({impacted: this.state.cropData, impacting: impacting, positive: isPositive}).then(() => this.refillCompanions());            
     }
 
     render()
@@ -83,16 +77,14 @@ class CropEditPage extends React.Component
         if(this.state.cropData && this.state.companions && this.state.otherCrops)
         {
             const comps = this.state.companions.map(
-                cmp => <CompanionItem id = {cmp.cropId2}  key = {cmp.cropId2} positive = {cmp.positive} onRemove = {this.onCompanionRemove.bind(this)}/>
+                cmp => <CompanionItem id = {cmp.id}  key = {cmp.id} positive = {cmp.positive} impactingCrop = {cmp.impacting} onRemove = {this.onCompanionRemove.bind(this)}/>
             );
-            const options = this.state.otherCrops.filter(crop => crop.id != this.props.match.params.cropId && !this.state.companions.some(e => e.cropId2 === crop.id)).map(c => c.name);
-            console.log(comps);
+            const options = this.state.otherCrops.filter(crop => crop.id != this.props.match.params.cropId && !this.state.companions.some(c => c.impacting.id === crop.id)).map(c => c.name);
             return( 
                     <div style ={{margin: "5%"}}>
                         <h1 style = {{display: "inline-block"}}>{this.state.cropData.name}</h1>
-                        <h3 style ={{fontStyle: "italic"}}>{this.state.cropData.binomialName}</h3>
                         <img src = {this.state.cropData.imageUrl} alt = "" style = {{width: "15%"}}/>
-                        <p>Diameter: {this.state.cropData.diameter} cm </p>
+                        <p>Diameter: {this.state.cropData.diameter * 5} cm </p>
                         <p> Description: {this.state.cropData.description ||  "n/a"}</p>
                         <h2>Companions</h2>
                         <Tabs>

@@ -24,9 +24,7 @@ class GardenList extends React.Component
     {
         if(this.state.gardens)
         {
-            console.log(this.state.gardens)
             var gardenComponents = this.state.gardens.map(g => <GardenListItem key={g.id} id={g.id} name={g.name} length={g.length} width={g.width} contentId={g.gardenContents[0].id} />)
-            console.log(gardenComponents);
             return(
                 <div>
                     <Link to = '/creategarden'>

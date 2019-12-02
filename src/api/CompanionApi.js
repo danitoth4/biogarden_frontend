@@ -25,24 +25,23 @@ class CompanionApi
         return fetch(`${SERVER_URL}/${id}`, options).then(response => ResponseHandler.handle(response));
     }
 
-    static async addCompanions(companions)
+    static async addCompanion(companion)
     {
         const options = {
             method: "post",
             headers: MyHeaders.getHeadersWithContentType(),
-            body: JSON.stringify(companions)
+            body: JSON.stringify(companion)
         };
         return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));
     }
 
-    static async deleteCompanions(companions)
+    static async deleteCompanion(id)
     {
         const options = {
             method: "delete",
-            headers: MyHeaders.getHeadersWithContentType(),
-            body: JSON.stringify(companions)
+            headers: MyHeaders.getHeaders()
         };
-        return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));
+        return fetch(`${SERVER_URL}/${id}`, options).then(response => ResponseHandler.handle(response));
     }
 }
 export default CompanionApi;

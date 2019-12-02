@@ -15,7 +15,6 @@ export class ResponseHandler
             }
             else
             {
-                console.log()
                 return true;
             }
         }
