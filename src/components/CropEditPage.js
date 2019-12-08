@@ -1,7 +1,7 @@
 import React from 'react';
 import CropApi from '../api/CropApi';
 import CompanionApi from '../api/CompanionApi';
-import { Tab, Tabs, Select, Button, Text} from 'grommet';
+import { Tab, Tabs, Select, Button, Box, Heading} from 'grommet';
 import { Link } from 'react-router-dom';
 import CompanionItem from './CompanionItem';
 
@@ -80,21 +80,24 @@ class CropEditPage extends React.Component
                 cmp => <CompanionItem id = {cmp.id}  key = {cmp.id} positive = {cmp.positive} impactingCrop = {cmp.impacting} onRemove = {this.onCompanionRemove.bind(this)}/>
             );
             const options = this.state.otherCrops.filter(crop => crop.id != this.props.match.params.cropId && !this.state.companions.some(c => c.impacting.id === crop.id)).map(c => c.name);
-            return( 
-                    <div style ={{margin: "5%"}}>
-                        <h1 style = {{display: "inline-block"}}>{this.state.cropData.name}</h1>
+            return(
+                    <Box pad = "small" background="light-1" elevation = "xlarge" round alignSelf = "center" align = "center" width = "40%">  
+                        <Heading level = '1' style = {{display: "inline-block"}}>{this.state.cropData.name}</Heading>
                         <img src = {this.state.cropData.imageUrl} alt = "" style = {{width: "15%"}}/>
-                        <p>Diameter: {this.state.cropData.diameter * 5} cm </p>
+                        <p>Length: {this.state.cropData.length * 5} cm </p>
+                        <p>Width: {this.state.cropData.width * 5} cm </p>
                         <p> Description: {this.state.cropData.description ||  "n/a"}</p>
                         <h2>Companions</h2>
                         <Tabs>
                             <Tab title = "Preferable">
-                                <Select 
-                                    options={options}
-                                    value = {"Add.."}
-                                    onChange={({ option }) => this.onCompanionAdded(option, true)}
-                                />
-                                {comps.filter(cmp => cmp.props.positive)}
+                                <Box gap = "xsmall">
+                                    <Select 
+                                        options={options}
+                                        value = {"Add.."}
+                                        onChange={({ option }) => this.onCompanionAdded(option, true)}
+                                    />
+                                    {comps.filter(cmp => cmp.props.positive)}
+                                </Box>
                             </Tab>
                             <Tab title = "Avoidable">
                                 <Select 
@@ -108,7 +111,7 @@ class CropEditPage extends React.Component
                         <Link to = {{pathname: '/'}}>
                             <Button primary = {true} alignSelf = "center" color = "neutral-1" label = "Back to Garden"/>
                         </Link>
-                    </div> 
+                    </Box>
                 
             );
         }

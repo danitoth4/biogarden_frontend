@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Form, FormField  } from 'grommet';
+import { Button, Form, FormField, Box  } from 'grommet';
 import GardenApi from '../api/GardenApi';
+import backgroundPath from '../backgroundPath.js'
 
 
 export default class NewGardenPage extends React.Component
@@ -8,14 +9,16 @@ export default class NewGardenPage extends React.Component
     render()
     {
         return(
-            <div>
+            <Box align="center" justify="center" height  = "100vh">
                 <Form onSubmit = {(garden) => { garden.value.width = Number(garden.value.width); garden.value.length = Number(garden.value.length); GardenApi.createGarden(garden.value).then( this.props.history.push("/")) }}>
-                    <FormField name = "name" label = "Name" required = {true} />
-                    <FormField validate = {validateWidthAndLength} name = "width" label = "Width" />
-                    <FormField validate = {validateWidthAndLength} name = "length" label = "Length" />
-                    <Button primary = {true} alignSelf = "center" color = "neutral-1" label = "Save" type = "submit"/>
+                    <Box background="light-1" pad = "large" elevation = "xlarge" round justify = "center">  
+                        <FormField name = "name" label = "Name" required = {true} />
+                        <FormField validate = {validateWidthAndLength} name = "width" label = "Width" />
+                        <FormField validate = {validateWidthAndLength} name = "length" label = "Length" />
+                        <Button primary = {true} alignSelf = "center" color = "neutral-1" label = "Save" type = "submit"/>
+                    </Box>
                 </Form>
-            </div>
+            </Box>
         );
     }
 }

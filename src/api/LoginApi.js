@@ -3,7 +3,7 @@ const config = {
     clientSecret: "secret"
 }
 
-const tokenUrl = "http://@localhost:8081/oauth/token";
+const tokenUrl = "http://localhost:8081/oauth/token";
 
 
 export default class LoginApi

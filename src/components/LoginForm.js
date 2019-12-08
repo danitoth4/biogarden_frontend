@@ -1,20 +1,22 @@
 import React from 'react';
-import { Button, Form, FormField  } from 'grommet';
+import { Button, Form, FormField, Box, Grid  } from 'grommet';
 import LoginApi from '../api/LoginApi';
-
+import backgroundPath from '../backgroundPath.js'
 
 export default class LoginForm extends React.Component
 {
     render()
     {
-        return(
-            <div>
+        return(            
+            <Box align="center" justify="center" height  = "100vh">
                 <Form onSubmit = {(login) => this.submit(login)}>
-                    <FormField name = "username" label = "Username" required = {true} />
-                    <FormField name = "password" label = "Password" required = {true} />
-                    <Button primary = {true} alignSelf = "center" color = "neutral-1" label = "Save" type = "submit"/>
+                    <Box background="light-1" pad = "large" elevation = "xlarge" round justify = "center">
+                        <FormField name = "username" label = "Username" required = {true} />
+                        <FormField name = "password" label = "Password" required = {true} type="password" />
+                        <Button primary = {true} color = "neutral-1" label = "Login" type = "submit"/>
+                    </Box>
                 </Form>
-            </div>
+            </Box>
         );
     }
 

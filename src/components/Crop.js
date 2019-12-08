@@ -1,10 +1,8 @@
 import React from 'react';
-import deleteicon from  '../content/delete.png';
-import planting from '../content/planting.png';
-import details from '../content/details.png';
 import CropApi from "../api/CropApi";
-import  {Text} from 'grommet';
+import  {Text, Box, Image, Heading} from 'grommet';
 import {Link} from 'react-router-dom';
+import {Add, Trash} from 'grommet-icons';
 
 export default class Crop extends React.Component
 {
@@ -36,22 +34,18 @@ export default class Crop extends React.Component
         const style = 
         {
             display: "inline",
-            width: "7%",
-            height: "7%",
+            alignSelf: "center",
+            width: "30px",
+            height: "30px",
             margin: "1%"
         }
         if (this.state.crop)
         return(
-            <div>
-                <img style={style} alt = "" src = {this.state.crop.imageUrl}/>
-                <Text style = {style}>{this.state.crop.name}</Text>
-                <img src = {planting} alt = "" style = {style} title = "Plant" onClick = {() =>this.props.cropSelected(this.props.crop)}/>
-                <Link to = {{pathname: `/crop/${this.state.crop.id}`}}>
-                    <img src = {details} alt = "" style = {style} title = "Details"/>
-                </Link>
-                <img src = {deleteicon} alt = "" style = {style} title = "Delete" onClick = {this.handleDelete}/>
-                <hr />             
-            </div>
+                <Box round pad = "xsmall" margin = "xsmall" align = "center" justify="between" background = {{color: "light-1", opacity: "0.8"}} direction = "row" >            
+                    <Image style = {style} src = {this.state.crop.imageUrl}/>
+                    <Heading color = "black" level={3} style = {style}>{this.state.crop.name}</Heading>                     
+                    <Trash color = "black" style = {style} size = "medium" onClick = {this.handleDelete}/>
+                </Box>
         );
         else
         return(<h1>Loading...</h1>)

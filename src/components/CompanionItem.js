@@ -1,22 +1,22 @@
 import React from 'react';
 import CropApi from '../api/CropApi';
 import { Text } from 'grommet';
-import minus from '../content/minus.png';
+import {Trash} from 'grommet-icons';
 
 class CompanionItem extends React.Component {
     render() {
         const style =
         {
             display: "inline",
-            width: "2%",
-            height: "2%",
+            width: "4%",
+            height: "4%",
             margin: "1%"
         }
         return (
             <div>
                 <img style={style} alt="" src={this.props.impactingCrop.imageUrl} />
                 <Text>{this.props.impactingCrop.name}</Text>
-                <img style={style} alt="remove" src={minus} onClick={() => this.props.onRemove(this.props.id)} />
+                <Trash style={style} alt="remove" onClick={() => this.props.onRemove(this.props.id)} />
                 <hr />
             </div>
         );
