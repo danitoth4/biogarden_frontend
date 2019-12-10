@@ -23,7 +23,7 @@ export default class GardenListItem extends React.Component
             </Link>
         );
         return(
-            <Box round pad = "small" gap = "xsmall" margin = "xsmall" align = "center" justify="fkex-start" background = {{color: "light-1", opacity: "0.8"}} direction = "row" >               
+            <Box round pad = "small" gap = "xsmall" margin = "xsmall" align = "center" background = {{color: "light-1", opacity: "0.8"}} direction = "row" >               
                 <Heading color = "black" level = '1'>{this.props.garden.name}</Heading>
                 {gardenContents}
             </Box>

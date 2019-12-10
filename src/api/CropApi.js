@@ -38,6 +38,18 @@ class CropApi
 
         return fetch(`${SERVER_URL}/${cropId}`, options).then(response => ResponseHandler.handle(response));
     }
+
+    static async createCrop(crop)
+    {
+        const options =
+        {
+            method: "post",
+            headers: MyHeaders.getHeadersWithContentType(),
+            body: JSON.stringify(crop)
+        };
+
+        return fetch(SERVER_URL, options).then(response => ResponseHandler.handle(response));
+    }
 }
 
 export default CropApi;

@@ -28,7 +28,7 @@ class GardenList extends React.Component
 
     deleteCrop(id)
     {
-        console.log('mamaba');
+        CropApi.deleteCrop(id).then( () => CropApi.getAllCrops().then(data => this.setState({crops: data})))
     }
 
     render()
@@ -46,7 +46,7 @@ class GardenList extends React.Component
             }
             console.log(backgroundPath);
             var cropComponents = this.state.crops.map(c => 
-                    <Box round pad = "xsmall" margin = "xsmall" align = "center" justify="between" background = {{color: "light-1", opacity: "0.8"}} direction = "row" >            
+                    <Box key={c.id} round pad = "xsmall" margin = "xsmall" align = "center" justify="between" background = {{color: "light-1", opacity: "0.8"}} direction = "row" >            
                         <Image style = {style} src = {c.imageUrl}/>
                         <Link style={{textDecoration: "none"}} to = {{pathname: `/crop/${c.id}`}}>
                             <Heading color = "black" level={3} style = {style}>{c.name}</Heading>                     
@@ -74,7 +74,7 @@ class GardenList extends React.Component
                         </Box>
                     </Box>
                     <Box gridArea="crops" gap = "medium">
-                        <Link to = '/creategarden'>
+                        <Link to = '/createcrop'>
                             <Button margin = "small" primary = {true} color = "neutral-1" label = "New Crop"/>
                         </Link>
                         <Box pad = "medium"> 
